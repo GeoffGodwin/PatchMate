@@ -1,0 +1,4 @@
+update_schedule: weekly # Defines when PatchMate should check dependencies. Options: daily, weekly, monthly
+auto_merge_minor: false # Controls auto-merging of minor updates. Options: true, false
+notify_major_changes: true
+ai_mode: MEDIUM # Options: LOW, MEDIUM, HIGH (Determines how aggressive the AI should be. HIGH may result in more dangerous code for major patches.)
