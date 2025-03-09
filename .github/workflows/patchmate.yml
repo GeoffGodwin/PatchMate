@@ -2,7 +2,12 @@ name: PatchMate Dependency Check
 
 on:
   schedule:
-    - cron: '0 0 * * 7' # Runs every Sunday
+    - cron: "0 0 * * 0"  # Runs at midnight every Sunday (GitHub uses 0 for Sunday)
+  push:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:  # Allows manual trigger
   pull_request:
     paths:
       - "package.json"
