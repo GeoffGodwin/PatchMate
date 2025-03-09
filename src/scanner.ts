@@ -22,10 +22,16 @@ export const scanDependencies = (): Record<string, any> => {
         }
     }
 
+    if (Object.keys(outdatedDeps).length === 0) {
+        console.log("✅ No outdated dependencies detected.");
+        return {};
+    }
+
     // Save outdated dependencies to a log file
     const outputPath = path.join(__dirname, "../outdated-dependencies.json");
     fs.writeFileSync(outputPath, JSON.stringify(outdatedDeps, null, 2));
     console.log(`📄 Outdated dependency report saved to: ${outputPath}`);
-
+    console.table(outdatedDeps);
+    
     return outdatedDeps;
 };
