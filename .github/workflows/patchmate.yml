@@ -1,0 +1,31 @@
+name: PatchMate Dependency Check
+
+on:
+  schedule:
+    - cron: '0 0 * * 7' # Runs every Sunday
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+
+jobs:
+  patchmate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install PatchMate
+        run: npm install -g patchmate
+
+      - name: Run PatchMate Scan
+        run: patchmate scan
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
