@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "patchmate": "ts-node patchmate.ts"
+    "patchmate": "node dist/patchmate.js"
   },
   "keywords": [],
   "author": "",
