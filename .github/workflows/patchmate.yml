@@ -40,7 +40,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Compile TypeScript
+        run: npx tsc
+
       - name: Run PatchMate Scan
-        run: npx ts-node src/patchmate.ts
+        run: node dist/patchmate.js  # Run compiled JS instead of TS
         env:
           AWS_REGION: us-east-1
