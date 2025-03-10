@@ -1,7 +1,7 @@
 {
   "name": "patchmate",
   "version": "1.0.0",
-  "description": "AI-driven dependency updates that suggest code changes and auto-patch your repo.",
+  "description": "AI-driven dependency updates that suggest code changes and auto-patches your repo.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
