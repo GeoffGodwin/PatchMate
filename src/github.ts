@@ -29,13 +29,22 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
     const owner = config.github_user;
     const repo = config.github_repo;
     const base = config.target_branch;
-    const branchName = `patchmate/update-${packageName}-${newVersion}`;
+    let branchName = `patchmate/update-${packageName}-${newVersion}`;
 
     try {
-        // Ensure the base branch exists before creating a new branch
+        // Step 1: Check if the branch already exists
+        const existingBranches = await octokit.repos.listBranches({ owner, repo });
+        const branchExists = existingBranches.data.some(branch => branch.name === branchName);
+
+        if (branchExists) {
+            console.warn(`⚠️ Branch '${branchName}' already exists. Creating an alternate branch.`);
+            branchName = `patchmate/update-${packageName}-${newVersion}-${Date.now()}`;
+        }
+
+        // Step 2: Get SHA of base branch (main)
         const baseBranch = await octokit.repos.getBranch({ owner, repo, branch: base });
 
-        // Create a new branch from the latest commit of the base branch
+        // Step 3: Create new branch from base branch
         await octokit.git.createRef({
             owner,
             repo,
@@ -43,7 +52,7 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
             sha: baseBranch.data.commit.sha
         });
 
-        // Create the Pull Request
+        // ✅ Step 4: Create the Pull Request
         await octokit.pulls.create({
             owner,
             repo,
@@ -53,7 +62,7 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
             base
         });
 
-        console.log(`✅ PR created for ${packageName}`);
+        console.log(`✅ PR created for ${packageName} in branch ${branchName}`);
     } catch (error: any) {
         console.error(`⚠️ Failed to create PR for ${packageName}: ${error.message}`);
     }
