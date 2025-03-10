@@ -15,13 +15,14 @@ console.log(`🛠 AI Aggressiveness Level: ${CONFIG.ai_mode}`);
 const outdatedDeps = scanDependencies();
 
 // Process each outdated dependency
-for (const packageName in outdatedDeps) {
-    const newVersion = outdatedDeps[packageName].latest;
-    const oldVersion = outdatedDeps[packageName].current;
+for (const index in outdatedDeps) {
+    const newVersion = outdatedDeps[index].latest;
+    const oldVersion = outdatedDeps[index].current;
+    const packageName = outdatedDeps[index].package;
 
     analyzeChangelog(packageName, newVersion).then((analysis) => {
         if (CONFIG.ai_mode === Aggressiveness.LOW) {
-            console.log(`⚠️ ${packageName}: Needs update from ${oldVersion} → ${newVersion}.`);
+            console.log(`⚠️ ${index}: Needs update from ${oldVersion} → ${newVersion}.`);
         } else if (analysis.includes("breaking change")) {
             createGitHubIssue(packageName, analysis);
         } else {
