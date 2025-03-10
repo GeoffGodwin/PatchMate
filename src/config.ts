@@ -1,23 +1,28 @@
 import * as fs from "fs";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 import path from "path";
+
+// Ensure we read the config from the project's root directory
+const CONFIG_PATH = path.join(process.cwd(), ".patchmate.yml");
 
 export enum Aggressiveness {
     LOW = "LOW",
     MEDIUM = "MEDIUM",
     HIGH = "HIGH"
 }
-const CONFIG_PATH = path.join(process.cwd(), ".patchmate.yml");
 
 export const getConfig = () => {
     if (!fs.existsSync(CONFIG_PATH)) {
         console.log("⚠️ .patchmate.yml not found. Generating a default config...");
+
         const defaultConfig = {
             ai_provider: "AWS",
             ai_mode: Aggressiveness.MEDIUM,
             update_schedule: "weekly"
         };
+
         fs.writeFileSync(CONFIG_PATH, yaml.dump(defaultConfig));
+        console.log("✅ Default .patchmate.yml created at", CONFIG_PATH);
     }
 
     try {

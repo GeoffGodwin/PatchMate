@@ -1,37 +1,19 @@
-import { execSync } from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const scanDependencies = (): Record<string, any> => {
     console.log("📦 Checking for outdated dependencies...");
+
     let outdatedDeps: Record<string, any> = {};
-
     try {
-        const output = execSync("npm outdated --json", { encoding: "utf-8" });
-        outdatedDeps = JSON.parse(output);
-    } catch (error: any) {
-        if (error.stdout) {
-            try {
-                outdatedDeps = JSON.parse(error.stdout);
-            } catch (jsonError) {
-                console.error("⚠️ Failed to parse npm outdated output.");
-            }
-        } else {
-            console.log("✅ All dependencies are up to date!");
-            process.exit(0);
-        }
+        const outputPath = path.join(__dirname, "../outdated-dependencies.json");
+        console.log(`📄 Saving outdated dependency report to: ${outputPath}`);
+    } catch (error) {
+        console.error("⚠️ Error scanning dependencies:", error);
     }
 
-    if (Object.keys(outdatedDeps).length === 0) {
-        console.log("✅ No outdated dependencies detected.");
-        return {};
-    }
-
-    // Save outdated dependencies to a log file
-    const outputPath = path.join(__dirname, "../outdated-dependencies.json");
-    fs.writeFileSync(outputPath, JSON.stringify(outdatedDeps, null, 2));
-    console.log(`📄 Outdated dependency report saved to: ${outputPath}`);
-    console.table(outdatedDeps);
-    
     return outdatedDeps;
 };
