@@ -14,7 +14,8 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist"
+    "dist",
+    ".patchmate.yml"
   ],
   "keywords": [
     "npm",
