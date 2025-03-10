@@ -28,19 +28,34 @@ export const analyzeChangelog = async (packageName: string, newVersion: string):
 
     console.log(`🤖 AI analyzing changelog for ${packageName}@${newVersion}...`);
 
-    const prompt = `Analyze the changelog for ${packageName} version ${newVersion}. Summarize breaking changes and provide migration suggestions.`;
+    const promptText = `Analyze the changelog for ${packageName} version ${newVersion}. 
+    Summarize breaking changes and provide migration suggestions.`;
+    
+    // AWS Bedrock expects `inputText` instead of just `prompt`
+    const requestBody = {
+        inputText: promptText,
+        textGenerationConfig: {
+            maxTokenCount: 250,
+            stopSequences: [],
+            temperature: 0.5,
+            topP: 0.9
+        }
+    };
 
     const command = new InvokeModelCommand({
         modelId: "amazon.titan-text-lite-v1",
         contentType: "application/json",
         accept: "application/json",
-        body: JSON.stringify({ prompt, maxTokens: 250 })
+        body: JSON.stringify(requestBody)
     });
 
     try {
         const response = await bedrockClient.send(command);
-        const output = response.body?.toString() || "No analysis available.";
+        const responseBody = JSON.parse(Buffer.from(response.body as Uint8Array).toString("utf8"));
+
+        const output = responseBody.results?.[0]?.outputText || "No analysis available.";
         console.log(`📝 AI Analysis for ${packageName}@${newVersion}:\n${output}`);
+        
         updateUsage();
         return output;
     } catch (error) {
