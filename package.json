@@ -1,19 +1,24 @@
 {
   "name": "patchmate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-driven dependency updates that suggest code changes and auto-patches your repo.",
   "main": "dist/patchmate.js",
   "bin": {
     "patchmate": "dist/patchmate.js"
   },
-  "type":"module",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "patchmate": "node dist/patchmate.js",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["npm", "dependency", "automation", "AI"],
+  "keywords": [
+    "npm",
+    "dependency",
+    "automation",
+    "AI"
+  ],
   "author": "Geoff Godwin",
   "license": "Apache-2.0",
   "devDependencies": {
