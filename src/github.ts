@@ -23,7 +23,7 @@ export const createGitHubIssue = async (packageName: string, analysis: string) =
     console.log(`✅ GitHub Issue created for ${packageName}`);
 };
 
-export const createGitHubPR = async (packageName: string, oldVersion: string, newVersion: string) => {
+export const createGitHubPR = async (packageName: string, oldVersion: string, newVersion: string, updatedFiles: { [filename: string]: string }) => {
     console.log(`📦 Creating PR to update ${packageName}...`);
 
     const owner = config.github_user;
@@ -32,7 +32,7 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
     let branchName = `patchmate/update-${packageName}-${newVersion}`;
 
     try {
-        // Step 1: Check if the branch already exists
+        // Step 1: Check if branch already exists
         const existingBranches = await octokit.repos.listBranches({ owner, repo });
         const branchExists = existingBranches.data.some(branch => branch.name === branchName);
 
@@ -44,7 +44,7 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
         // Step 2: Get SHA of base branch (main)
         const baseBranch = await octokit.repos.getBranch({ owner, repo, branch: base });
 
-        // Step 3: Create new branch from base branch
+        // Step 3: Create a new branch from base branch
         await octokit.git.createRef({
             owner,
             repo,
@@ -52,7 +52,28 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
             sha: baseBranch.data.commit.sha
         });
 
-        // ✅ Step 4: Create the Pull Request
+        console.log(`🔄 Checking for file changes before committing...`);
+        if (Object.keys(updatedFiles).length === 0) {
+            console.warn(`⚠️ No changes detected for ${packageName}. Skipping PR creation.`);
+            return;
+        }
+
+        // Step 4: Commit the updated files
+        for (const [filePath, fileContent] of Object.entries(updatedFiles)) {
+            const fileSha = await getExistingFileSha(owner, repo, filePath);
+            
+            await octokit.repos.createOrUpdateFileContents({
+                owner,
+                repo,
+                path: filePath,
+                message: `⬆️ PatchMate: Update ${packageName} to ${newVersion}`,
+                content: Buffer.from(fileContent).toString("base64"),
+                branch: branchName,
+                sha: fileSha
+            });
+        }
+
+        // Step 5: Create the Pull Request
         await octokit.pulls.create({
             owner,
             repo,
@@ -65,5 +86,16 @@ export const createGitHubPR = async (packageName: string, oldVersion: string, ne
         console.log(`✅ PR created for ${packageName} in branch ${branchName}`);
     } catch (error: any) {
         console.error(`⚠️ Failed to create PR for ${packageName}: ${error.message}`);
+    }
+};
+
+// Helper function to get SHA of an existing file in the repo
+const getExistingFileSha = async (owner: string, repo: string, filePath: string): Promise<string | undefined> => {
+    try {
+        const response = await octokit.repos.getContent({ owner, repo, path: filePath });
+        return (response.data as any).sha;
+    } catch (error) {
+        console.warn(`⚠️ File '${filePath}' not found in repo.`);
+        return undefined;
     }
 };
