@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "AI-driven dependency updates that suggest code changes and auto-patches your repo.",
   "main": "index.js",
+  "type":"module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "patchmate": "node dist/patchmate.js"
