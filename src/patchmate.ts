@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 import { scanDependencies } from "./scanner.js";
 import { analyzeChangelog } from "./ai.js";
 import { createGitHubIssue, createGitHubPR } from "./github.js";
