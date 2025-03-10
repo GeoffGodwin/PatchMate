@@ -1,6 +1,6 @@
 {
   "name": "patchmate",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "AI-driven dependency updates that suggest code changes and auto-patches your repo.",
   "main": "dist/patchmate.js",
   "bin": {
