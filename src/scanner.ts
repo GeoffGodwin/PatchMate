@@ -1,11 +1,9 @@
-import { fileURLToPath } from "url";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import path from "path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const outputPath = path.join(__dirname, "../outdated-dependencies.json");
+// Ensure the outdated dependencies file is saved in the user's project directory.
+const outputPath = path.join(process.cwd(), "outdated-dependencies.json");
 
 export const scanDependencies = (): Record<string, any> => {
     console.log("📦 Checking for outdated dependencies...");
